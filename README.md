@@ -10,11 +10,17 @@
 ##  Repository Structure
 
 ml-teaching-lab/
+
 ├── 01-decision-trees-random-forests/   # Demo lesson + Python practice
+
 ├── 02-fine-tuning-llms/                # LoRA, PEFT, instruction tuning
+
 ├── 03-rag-systems/                     # Retrieval-Augmented Generation
+
 ├── 04-ai-agents/                       # Autonomous agents with tools
+
 ├── 05-model-serving-fastapi/           # Deploy ML models to production
+
 └── resources/                          # Cheat sheets, lesson plans, slides
 
 ---
