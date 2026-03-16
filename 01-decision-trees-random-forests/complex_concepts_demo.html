@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Trees & Random Forests — Complex Concepts Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f8f7f4; color: #1a1a1a; padding: 1.5rem; }
+  #app { max-width: 780px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: #1F4E79; border-radius: 16px; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #E6F1FB; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: #85B7EB; }
+  .header .badge { display: inline-block; background: #2E75B6; color: #B5D4F4; font-size: 12px; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
+
+  .concept-nav { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .cnav { flex: 1; padding: 12px 8px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 13px; cursor: pointer; text-align: center; background: #fff; color: #666; line-height: 1.4; transition: all .2s; }
+  .cnav:hover { border-color: #2E75B6; }
+  .cnav.c1.active { border-color: #1D9E75; background: #E1F5EE; color: #085041; font-weight: 600; }
+  .cnav.c2.active { border-color: #185FA5; background: #E6F1FB; color: #042C53; font-weight: 600; }
+  .cnav.c3.active { border-color: #854F0B; background: #FAEEDA; color: #412402; font-weight: 600; }
+
+  .panel { display: none; background: #fff; border-radius: 16px; padding: 1.5rem; border: 0.5px solid #e0e0e0; }
+  .panel.active { display: block; }
+
+  .concept-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-bottom: 10px; text-transform: uppercase; }
+  .l1 { background: #E1F5EE; color: #085041; }
+  .l2 { background: #E6F1FB; color: #042C53; }
+  .l3 { background: #FAEEDA; color: #412402; }
+
+  .section-title { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+  .section-sub { font-size: 14px; color: #666; margin-bottom: 1.25rem; line-height: 1.6; }
+
+  /* GINI */
+  .bowls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .bowl-wrap { background: #f8f7f4; border: 1px solid #e0e0e0; border-radius: 12px; padding: 14px; }
+  .bowl-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; }
+  .scoops { display: flex; flex-wrap: wrap; gap: 5px; min-height: 44px; margin-bottom: 10px; align-items: center; }
+  .scoop { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: transform .1s; border: 2px solid rgba(0,0,0,0.1); }
+  .scoop:hover { transform: scale(1.2); }
+  .btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .ab { padding: 5px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 12px; cursor: pointer; background: #fff; color: #333; transition: all .15s; }
+  .ab:hover { background: #E1F5EE; border-color: #1D9E75; }
+  .clr { padding: 5px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 12px; cursor: pointer; background: #fff; color: #999; }
+  .clr:hover { background: #f0f0f0; }
+  .gini-result { text-align: center; padding: 10px; border-radius: 10px; transition: background .3s; }
+  .gini-num { font-size: 28px; font-weight: 700; }
+  .gini-bar { height: 6px; border-radius: 3px; background: #e0e0e0; margin: 6px 0; }
+  .gini-fill { height: 6px; border-radius: 3px; transition: width .5s, background .5s; }
+  .gini-word { font-size: 12px; font-weight: 600; }
+
+  .formula-card { background: #f0f4f8; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; border-left: 4px solid #2E75B6; }
+  .formula-title { font-size: 13px; font-weight: 600; color: #1F4E79; margin-bottom: 6px; }
+  .formula-code { font-family: 'Courier New', monospace; font-size: 12px; color: #333; line-height: 1.9; white-space: pre-wrap; }
+
+  .wow-box { background: #E1F5EE; border-radius: 12px; padding: 14px 16px; border: 1px solid #9FE1CB; margin-top: 12px; }
+  .wow-box p { font-size: 13px; color: #085041; line-height: 1.7; }
+
+  .run-btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: all .2s; }
+  .green-btn { background: #1D9E75; color: #fff; }
+  .green-btn:hover { background: #0F6E56; }
+  .blue-btn { background: #185FA5; color: #fff; }
+  .blue-btn:hover { background: #0C447C; }
+  .amber-btn { background: #854F0B; color: #FAEEDA; }
+  .amber-btn:hover { background: #633806; }
+
+  /* BIAS VARIANCE */
+  .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; background: #f8f7f4; padding: 12px 16px; border-radius: 12px; }
+  .slider-row label { font-size: 13px; font-weight: 600; color: #333; width: 90px; flex-shrink: 0; }
+  .slider-row input[type=range] { flex: 1; height: 6px; accent-color: #185FA5; cursor: pointer; }
+  .slider-row .val { font-size: 20px; font-weight: 700; color: #185FA5; min-width: 36px; text-align: right; }
+
+  .bv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .bv-card { background: #f8f7f4; border: 1px solid #e0e0e0; border-radius: 12px; padding: 14px; text-align: center; }
+  .bv-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .bv-num { font-size: 26px; font-weight: 700; }
+  .bv-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-top: 4px; }
+  .verdict-bar { height: 8px; border-radius: 4px; background: #e0e0e0; margin: 6px 0; }
+  .verdict-fill { height: 8px; border-radius: 4px; transition: width .5s, background .5s; }
+
+  .bv-verdict { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; text-align: center; transition: all .3s; margin-bottom: 10px; border: 1px solid; }
+  .student-analogy { background: #E6F1FB; border-radius: 12px; padding: 14px 16px; border: 1px solid #B5D4F4; margin-top: 10px; }
+  .student-analogy p { font-size: 13px; color: #042C53; line-height: 1.7; }
+
+  /* ENSEMBLE */
+  .doctors-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+  .doctor { border: 1px solid #e0e0e0; border-radius: 12px; padding: 10px 6px; text-align: center; background: #f8f7f4; transition: all .4s; }
+  .doctor.voted { border-color: #2E75B6; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .doctor-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+  .doctor-name { font-size: 11px; font-weight: 600; color: #333; }
+  .doctor-spec { font-size: 10px; color: #888; margin-bottom: 4px; }
+  .doctor-acc { font-size: 10px; color: #999; margin-bottom: 5px; }
+  .doctor-vote { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 8px; display: inline-block; }
+  .vote-yes { background: #E1F5EE; color: #085041; }
+  .vote-no { background: #FCEBEB; color: #791F1F; }
+  .vote-pending { background: #f0f0f0; color: #aaa; }
+
+  .vote-result { background: #f8f7f4; border-radius: 12px; padding: 16px; text-align: center; margin: 12px 0; border: 1px solid #e0e0e0; }
+  .vote-label { font-size: 12px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+  .vote-big { font-size: 22px; font-weight: 700; color: #333; }
+  .vote-sub { font-size: 12px; color: #888; margin-top: 6px; }
+
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .comp-card { background: #f8f7f4; border-radius: 12px; padding: 14px; text-align: center; border: 1px solid #e0e0e0; }
+  .comp-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .comp-num { font-size: 26px; font-weight: 700; }
+
+  .wow-amber { background: #FAEEDA; border-radius: 12px; padding: 14px 16px; border: 1px solid #FAC775; margin-top: 12px; display: none; }
+  .wow-amber p { font-size: 13px; color: #412402; line-height: 1.7; }
+
+  .instructor-note { background: #1F4E79; border-radius: 12px; padding: 14px 16px; margin-top: 16px; }
+  .instructor-note h4 { font-size: 13px; color: #85B7EB; margin-bottom: 6px; }
+  .instructor-note p { font-size: 13px; color: #E6F1FB; line-height: 1.6; font-style: italic; }
+
+  @media (max-width: 500px) {
+    .bowls-row { grid-template-columns: 1fr; }
+    .doctors-row { grid-template-columns: repeat(3, 1fr); }
+    .concept-nav { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="header">
+    <h1>🌳 Decision Trees & Random Forests</h1>
+    <p>Demonstration of Complex Concepts</p>
+    <span class="badge">ESDE Bachelor Program — ML Demo Lesson</span>
+  </div>
+
+  <div class="concept-nav">
+    <div class="cnav c1 active" onclick="showC('c1',this)">
+      🧮 Gini Impurity<br><span style="font-size:11px;opacity:.7">The math made simple</span>
+    </div>
+    <div class="cnav c2" onclick="showC('c2',this)">
+      🌀 Bias-Variance<br><span style="font-size:11px;opacity:.7">Why overfitting happens</span>
+    </div>
+    <div class="cnav c3" onclick="showC('c3',this)">
+      🗳️ Ensemble Power<br><span style="font-size:11px;opacity:.7">Why 100 trees win</span>
+    </div>
+  </div>
+
+  <!-- CONCEPT 1: GINI -->
+  <div id="c1" class="panel active">
+    <span class="concept-label l1">Complex Concept 1 — 7 minutes</span>
+    <div class="section-title">Gini Impurity — The Ice Cream Bowl</div>
+    <div class="section-sub">Add scoops to the bowls → watch Gini Impurity change live → the formula reveals itself naturally without memorization.</div>
+
+    <div class="bowls-row">
+      <div class="bowl-wrap">
+        <div class="bowl-title">🍨 Bowl A — flavour experiment</div>
+        <div class="scoops" id="scoops-a"></div>
+        <div class="btns">
+          <button class="ab" onclick="add('a','choc')">+ 🍫 Choc</button>
+          <button class="ab" onclick="add('a','van')">+ 🍦 Vanilla</button>
+          <button class="ab" onclick="add('a','straw')">+ 🍓 Strawberry</button>
+          <button class="clr" onclick="clr('a')">Clear</button>
+        </div>
+        <div class="gini-result" id="gr-a">
+          <div style="font-size:11px;color:#888;margin-bottom:2px">GINI IMPURITY</div>
+          <div class="gini-num" id="gn-a">—</div>
+          <div class="gini-bar"><div class="gini-fill" id="gf-a" style="width:0%"></div></div>
+          <div class="gini-word" id="gw-a"></div>
+        </div>
+      </div>
+      <div class="bowl-wrap">
+        <div class="bowl-title">🏥 Bowl B — hospital ward</div>
+        <div class="scoops" id="scoops-b"></div>
+        <div class="btns">
+          <button class="ab" onclick="add('b','sick')">+ 🤒 Sick</button>
+          <button class="ab" onclick="add('b','well')">+ 😊 Healthy</button>
+          <button class="clr" onclick="clr('b')">Clear</button>
+        </div>
+        <div class="gini-result" id="gr-b">
+          <div style="font-size:11px;color:#888;margin-bottom:2px">GINI IMPURITY</div>
+          <div class="gini-num" id="gn-b">—</div>
+          <div class="gini-bar"><div class="gini-fill" id="gf-b" style="width:0%"></div></div>
+          <div class="gini-word" id="gw-b"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="formula-title">📐 Live Calculation — Bowl B</div>
+      <div class="formula-code" id="formula-text">Gini = 1 - Σ(pᵢ²)
+
+Add patients to Bowl B to see the formula calculate itself...</div>
+    </div>
+
+    <div class="wow-box">
+      <p><strong>💡 The "aha" moment — say this out loud:</strong><br><br>
+      "A Decision Tree asks one question at every node: which split makes the groups most pure? Gini Impurity measures that purity. Lower number = purer = better split. The entire algorithm is just finding the question that brings Gini closest to zero — automatically, from data."</p>
+    </div>
+
+    <button class="run-btn green-btn" onclick="demoGini()">▶ Demo: Show hospital ward — 7 sick + 3 healthy → Gini = ?</button>
+
+    <div class="instructor-note">
+      <h4>🎓 Instructor note</h4>
+      <p>"Before I show the formula — let's build intuition. Add only chocolate to Bowl A. What's the Gini? Zero — perfectly pure. Now mix all flavours. Watch it rise to 0.5. Now you already understand Gini Impurity — you just watched it happen."</p>
+    </div>
+  </div>
+
+  <!-- CONCEPT 2: BIAS VARIANCE -->
+  <div id="c2" class="panel">
+    <span class="concept-label l2">Complex Concept 2 — 7 minutes</span>
+    <div class="section-title">Bias-Variance Tradeoff — The Goldilocks Problem</div>
+    <div class="section-sub">Drag the depth slider. Watch train and test accuracy diverge in real time. Find the sweet spot together with students.</div>
+
+    <div class="slider-row">
+      <label>max_depth</label>
+      <input type="range" id="depth-slider" min="1" max="20" value="4" step="1" oninput="updateBV()">
+      <span class="val" id="depth-val">4</span>
+    </div>
+
+    <div class="bv-grid">
+      <div class="bv-card">
+        <div class="bv-label">Train Accuracy</div>
+        <div class="bv-num" id="bv-train" style="color:#E24B4A">82%</div>
+        <div class="bv-status" style="background:#FCEBEB;color:#791F1F">training set</div>
+      </div>
+      <div class="bv-card">
+        <div class="bv-label">Test Accuracy</div>
+        <div class="bv-num" id="bv-test" style="color:#185FA5">80%</div>
+        <div class="bv-status" style="background:#E6F1FB;color:#042C53">unseen patients</div>
+      </div>
+      <div class="bv-card">
+        <div class="bv-label">Overfit Gap</div>
+        <div class="bv-num" id="bv-gap">2%</div>
+        <div class="verdict-bar"><div class="verdict-fill" id="gap-fill" style="width:4%;background:#1D9E75"></div></div>
+      </div>
+      <div class="bv-card">
+        <div class="bv-label">Model Status</div>
+        <div class="bv-num" id="bv-icon" style="font-size:32px">✅</div>
+        <div class="bv-status" id="bv-icon-s" style="background:#EAF3DE;color:#27500A">Balanced</div>
+      </div>
+    </div>
+
+    <div class="bv-verdict" id="bv-verdict" style="background:#EAF3DE;color:#27500A;border-color:#C0DD97">
+      depth=4 → Just right! Low bias, low variance. Deploy this model.
+    </div>
+
+    <div class="student-analogy">
+      <p id="analogy-text"><strong>🎓 Analogy:</strong> depth=4 is like a student who studied the concepts deeply — not so shallow they miss patterns, not so deep they memorized every exam question word-for-word. They generalize to new questions they've never seen before.</p>
+    </div>
+
+    <div class="instructor-note" style="margin-top:14px">
+      <h4>🎓 Instructor note</h4>
+      <p>"I will drag this slider slowly from 1 to 20. Watch the gap between red and blue. Students — shout STOP when you think we've hit the best balance. That moment of debate IS the concept of bias-variance tradeoff."</p>
+    </div>
+  </div>
+
+  <!-- CONCEPT 3: ENSEMBLE -->
+  <div id="c3" class="panel">
+    <span class="concept-label l3">Complex Concept 3 — 7 minutes</span>
+    <div class="section-title">Ensemble Power — Why 100 Mediocre Doctors Win</div>
+    <div class="section-sub">Each doctor sees different patient data, considers different symptoms. Watch them vote one by one — and see why the forest beats any single tree.</div>
+
+    <div style="background:#FAEEDA;border-radius:12px;padding:12px 16px;margin-bottom:12px;border:1px solid #FAC775">
+      <strong style="font-size:13px;color:#412402">Patient case:</strong>
+      <span style="font-size:13px;color:#633806"> Age 58 | Chest pain: YES | Vessels blocked: 2 | Max HR: 132 | Cholesterol: 289</span>
+    </div>
+
+    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px">The Medical Committee:</div>
+    <div class="doctors-row" id="doctors-row"></div>
+
+    <div class="vote-result">
+      <div class="vote-label">Majority vote — final diagnosis</div>
+      <div class="vote-big" id="vote-result">Waiting for committee...</div>
+      <div class="vote-sub" id="vote-sub">Click the button below to start the consultation</div>
+    </div>
+
+    <div class="comparison-row">
+      <div class="comp-card">
+        <div class="comp-label">Best single doctor</div>
+        <div class="comp-num" id="single-acc" style="color:#E24B4A">—</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">accuracy alone</div>
+      </div>
+      <div class="comp-card" style="border-color:#1D9E75">
+        <div class="comp-label">Forest (majority vote)</div>
+        <div class="comp-num" id="forest-acc" style="color:#1D9E75">—</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">accuracy together</div>
+      </div>
+    </div>
+
+    <button class="run-btn amber-btn" onclick="runEnsemble()">▶ Consult the medical committee — watch them vote!</button>
+
+    <div class="wow-amber" id="ensemble-wow">
+      <p><strong>💡 Why does this work mathematically?</strong><br><br>
+      Each doctor is wrong in a <em>different way</em>. Doctor 1 missed age as a factor. Doctor 2 underweighted chest pain. Doctor 3 missed vessels. But when they VOTE — the individual errors cancel each other out. The correct answer survives the majority vote.<br><br>
+      <strong>This is the mathematical foundation of Random Forest.</strong> 100 diverse trees, each trained on different data and different features, vote together. Their errors are uncorrelated — so they cancel. This is why ensemble methods almost always beat any single model.</p>
+    </div>
+
+    <div class="instructor-note" style="margin-top:14px">
+      <h4>🎓 Instructor note</h4>
+      <p>"You wouldn't trust one doctor with a life-or-death diagnosis. You'd get a second opinion. And a third. Random Forest does exactly this — automatically — for every prediction. The wisdom of crowds, implemented in code."</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============ CONCEPT 1: GINI ============
+const bowls = { a: [], b: [] };
+const flavors = {
+  choc:  { e: '🍫', c: '#7B3F00' },
+  van:   { e: '🍦', c: '#F5DEB3' },
+  straw: { e: '🍓', c: '#FF6B8A' },
+  sick:  { e: '🤒', c: '#E24B4A' },
+  well:  { e: '😊', c: '#1D9E75' }
+};
+
+function gini(arr) {
+  if (!arr.length) return null;
+  const t = arr.length, counts = {};
+  arr.forEach(f => counts[f] = (counts[f] || 0) + 1);
+  return Math.round((1 - Object.values(counts).reduce((s, c) => s + (c/t)**2, 0)) * 100) / 100;
+}
+
+function getStyle(g) {
+  if (g === null) return ['#f8f7f4', '#aaa', ''];
+  if (g === 0)    return ['#E1F5EE', '#085041', 'Perfectly pure! ✅ Gini = 0'];
+  if (g < 0.2)    return ['#EAF3DE', '#27500A', 'Very pure ✅'];
+  if (g < 0.4)    return ['#FAEEDA', '#633806', 'Mixed ⚠️'];
+  return ['#FCEBEB', '#791F1F', 'Very impure! ❌'];
+}
+
+function updateBowl(b) {
+  const arr = bowls[b], g = gini(arr);
+  const [bg, tc, word] = getStyle(g);
+  document.getElementById(`gn-${b}`).textContent = g !== null ? g.toFixed(2) : '—';
+  document.getElementById(`gn-${b}`).style.color = tc;
+  document.getElementById(`gf-${b}`).style.width = g !== null ? (g * 100) + '%' : '0%';
+  document.getElementById(`gf-${b}`).style.background = g === null ? '#ccc' : g < 0.3 ? '#1D9E75' : g < 0.45 ? '#BA7517' : '#E24B4A';
+  document.getElementById(`gw-${b}`).textContent = word;
+  document.getElementById(`gw-${b}`).style.color = tc;
+  document.getElementById(`gr-${b}`).style.background = bg;
+  const sc = document.getElementById(`scoops-${b}`);
+  sc.innerHTML = '';
+  arr.forEach((f, i) => {
+    const s = document.createElement('div');
+    s.className = 'scoop';
+    s.style.background = flavors[f].c;
+    s.textContent = flavors[f].e;
+    s.title = 'Click to remove';
+    s.onclick = () => { bowls[b].splice(i, 1); updateBowl(b); };
+    sc.appendChild(s);
+  });
+  if (b === 'b') updateFormula();
+}
+
+function updateFormula() {
+  const arr = bowls.b;
+  if (!arr.length) {
+    document.getElementById('formula-text').textContent = 'Gini = 1 - Σ(pᵢ²)\n\nAdd patients to Bowl B to see the formula calculate itself...';
+    return;
+  }
+  const t = arr.length, counts = {};
+  arr.forEach(f => counts[f] = (counts[f] || 0) + 1);
+  let lines = `Total patients: ${t}\n\n`;
+  let sq = 0;
+  const sqParts = [];
+  Object.entries(counts).forEach(([f, c]) => {
+    const p = (c / t).toFixed(2);
+    const s2 = ((c / t) ** 2).toFixed(4);
+    lines += `p(${flavors[f]?.e || f}) = ${c}/${t} = ${p}  →  ${p}² = ${s2}\n`;
+    sqParts.push(s2);
+    sq += (c / t) ** 2;
+  });
+  lines += `\nGini = 1 - (${sqParts.join(' + ')})\nGini = 1 - ${sq.toFixed(4)}\nGini = ${(1 - sq).toFixed(2)}`;
+  document.getElementById('formula-text').textContent = lines;
+}
+
+function add(b, f) { if (bowls[b].length >= 10) return; bowls[b].push(f); updateBowl(b); }
+function clr(b) { bowls[b] = []; updateBowl(b); }
+function demoGini() {
+  bowls.b = [];
+  for (let i = 0; i < 7; i++) bowls.b.push('sick');
+  for (let i = 0; i < 3; i++) bowls.b.push('well');
+  updateBowl('b');
+}
+
+// ============ CONCEPT 2: BIAS-VARIANCE ============
+function updateBV() {
+  const d = parseInt(document.getElementById('depth-slider').value);
+  document.getElementById('depth-val').textContent = d;
+  let train, test;
+  if (d <= 1)       { train = 65; test = 62; }
+  else if (d === 2) { train = 72; test = 70; }
+  else if (d === 3) { train = 78; test = 76; }
+  else if (d === 4) { train = 82; test = 80; }
+  else if (d === 5) { train = 86; test = 79; }
+  else if (d <= 7)  { train = 91; test = 74; }
+  else if (d <= 10) { train = 95; test = 66; }
+  else if (d <= 15) { train = 98; test = 58; }
+  else              { train = 100; test = 51; }
+  const gap = train - test;
+
+  document.getElementById('bv-train').textContent = train + '%';
+  document.getElementById('bv-test').textContent = test + '%';
+  document.getElementById('bv-gap').textContent = gap + '%';
+  document.getElementById('gap-fill').style.width = Math.min(gap * 3, 100) + '%';
+  document.getElementById('gap-fill').style.background = gap < 5 ? '#1D9E75' : gap < 15 ? '#BA7517' : '#E24B4A';
+
+  let verdict, vBg, vColor, vBorder, icon, iBg, iColor, iLabel, analogy;
+  if (d <= 2) {
+    verdict = `depth=${d} → Underfitting! Too shallow — the tree can't learn real patterns. Both train and test accuracy are low.`;
+    vBg='#FAEEDA';vColor='#412402';vBorder='#FAC775';icon='😴';iBg='#FAEEDA';iColor='#633806';iLabel='Underfit';
+    analogy = `<strong>🎓 Analogy:</strong> A doctor who only asks ONE question: "Do you have chest pain?" — misses most patterns. Too simple to be useful. This is HIGH BIAS.`;
+  } else if (d <= 5) {
+    verdict = `depth=${d} → Just right! ✅ Low bias, low variance. Real patterns learned, noise ignored. Deploy this model!`;
+    vBg='#EAF3DE';vColor='#27500A';vBorder='#C0DD97';icon='✅';iBg='#EAF3DE';iColor='#27500A';iLabel='Balanced';
+    analogy = `<strong>🎓 Analogy:</strong> A doctor who studied concepts deeply — asks the right questions, generalizes well to new patients they've never seen before.`;
+  } else if (d <= 10) {
+    verdict = `depth=${d} → Starting to overfit ⚠️ Train accuracy looks great but test drops. The tree is memorizing training examples instead of learning patterns.`;
+    vBg='#FAEEDA';vColor='#412402';vBorder='#FAC775';icon='⚠️';iBg='#FAEEDA';iColor='#633806';iLabel='Caution';
+    analogy = `<strong>🎓 Analogy:</strong> A student who memorized every past exam question. Aces practice tests. Struggles with any new questions they haven't seen before.`;
+  } else {
+    verdict = `depth=${d} → Severe overfitting! 🔥 100% train accuracy but terrible test performance. This model is useless on real new patients!`;
+    vBg='#FCEBEB';vColor='#791F1F';vBorder='#F7C1C1';icon='🔥';iBg='#FCEBEB';iColor='#791F1F';iLabel='Overfit!';
+    analogy = `<strong>🎓 Analogy:</strong> The student memorized answers including the typos. Perfect on known questions. Fails completely on anything new. This is HIGH VARIANCE.`;
+  }
+
+  document.getElementById('bv-verdict').textContent = verdict;
+  document.getElementById('bv-verdict').style.background = vBg;
+  document.getElementById('bv-verdict').style.color = vColor;
+  document.getElementById('bv-verdict').style.borderColor = vBorder;
+  document.getElementById('bv-icon').textContent = icon;
+  document.getElementById('bv-icon-s').style.background = iBg;
+  document.getElementById('bv-icon-s').style.color = iColor;
+  document.getElementById('bv-icon-s').textContent = iLabel;
+  document.getElementById('analogy-text').innerHTML = analogy;
+}
+
+// ============ CONCEPT 3: ENSEMBLE ============
+const doctorData = [
+  { name: 'Dr. Amir',  spec: 'Cardiologist', acc: 74, data: 'chest pain + age',      vote: null },
+  { name: 'Dr. Sarah', spec: 'Internist',     acc: 71, data: 'vessels + ECG',         vote: null },
+  { name: 'Dr. Chen',  spec: 'GP',            acc: 78, data: 'all vitals',            vote: null },
+  { name: 'Dr. Lena',  spec: 'Specialist',    acc: 69, data: 'cholesterol + BP',      vote: null },
+  { name: 'Dr. Omar',  spec: 'Researcher',    acc: 73, data: 'thal + slope',          vote: null },
+];
+const votes = [true, false, true, true, false];
+
+function renderDoctors() {
+  const row = document.getElementById('doctors-row');
+  row.innerHTML = '';
+  doctorData.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'doctor' + (d.vote !== null ? ' voted' : '');
+    el.innerHTML = `
+      <span class="doctor-icon">👨‍⚕️</span>
+      <div class="doctor-name">${d.name}</div>
+      <div class="doctor-spec">${d.spec}</div>
+      <div class="doctor-acc">${d.acc}% accuracy</div>
+      ${d.vote !== null
+        ? `<span class="doctor-vote ${d.vote ? 'vote-yes' : 'vote-no'}">${d.vote ? '❤️ YES' : '💚 NO'}</span>`
+        : `<span class="doctor-vote vote-pending">pending...</span>`}`;
+    row.appendChild(el);
+  });
+}
+
+async function runEnsemble() {
+  doctorData.forEach(d => d.vote = null);
+  renderDoctors();
+  document.getElementById('vote-result').textContent = 'Consulting committee...';
+  document.getElementById('vote-result').style.color = '#333';
+  document.getElementById('vote-sub').textContent = 'Each doctor reviews a different subset of the patient\'s data...';
+  document.getElementById('ensemble-wow').style.display = 'none';
+  document.getElementById('single-acc').textContent = '—';
+  document.getElementById('forest-acc').textContent = '—';
+
+  for (let i = 0; i < doctorData.length; i++) {
+    await new Promise(r => setTimeout(r, 700));
+    doctorData[i].vote = votes[i];
+    renderDoctors();
+  }
+
+  await new Promise(r => setTimeout(r, 500));
+  const yesVotes = votes.filter(v => v).length;
+  const noVotes = votes.filter(v => !v).length;
+  const finalVote = yesVotes > noVotes;
+
+  document.getElementById('vote-result').textContent = finalVote ? '❤️ HIGH RISK — Heart Disease Detected' : '💚 LOW RISK — Healthy';
+  document.getElementById('vote-result').style.color = finalVote ? '#E24B4A' : '#1D9E75';
+  document.getElementById('vote-sub').textContent = `${yesVotes} doctors voted YES, ${noVotes} voted NO → majority wins → ${finalVote ? 'Correct diagnosis ✅' : 'Incorrect ❌'}`;
+
+  document.getElementById('single-acc').textContent = Math.max(...doctorData.map(d => d.acc)) + '%';
+  document.getElementById('forest-acc').textContent = '85%';
+  document.getElementById('ensemble-wow').style.display = 'block';
+}
+
+function showC(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.cnav').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+// Init
+renderDoctors();
+updateBV();
+updateBowl('a');
+updateBowl('b');
+</script>
+</body>
+</html>
