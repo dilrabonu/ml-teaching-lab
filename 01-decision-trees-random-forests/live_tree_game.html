@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess My Object — Live Tree Builder</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f1117;
+    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #1a1d2e;
+    border-bottom: 2px solid #534AB7;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 { font-size: 18px; font-weight: 600; color: #AFA9EC; }
+  header p { font-size: 13px; color: #888; margin-top: 2px; }
+  .secret-box {
+    background: #1e2235;
+    border: 1px solid #534AB7;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #9F99E8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .secret-box span { color: #fff; font-weight: 600; font-size: 15px; }
+
+  .main { display: flex; flex: 1; gap: 0; }
+
+  /* Left panel */
+  .left-panel {
+    width: 300px;
+    min-width: 260px;
+    background: #14161f;
+    border-right: 1px solid #2a2d3e;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .panel-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #666; margin-bottom: 4px; }
+  .question-input {
+    background: #1e2235;
+    border: 1px solid #3a3d5a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #f0f0f0;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .question-input:focus { border-color: #534AB7; }
+  .question-input::placeholder { color: #555; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-yes { background: #1D9E75; color: #fff; }
+  .btn-yes:hover { background: #17b886; transform: translateY(-1px); }
+  .btn-no { background: #993C1D; color: #fff; }
+  .btn-no:hover { background: #c04a22; transform: translateY(-1px); }
+  .btn-reveal {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #534AB7;
+    background: transparent;
+    color: #AFA9EC;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .btn-reveal:hover { background: #534AB7; color: #fff; }
+  .btn-reset {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #3a3d5a;
+    background: transparent;
+    color: #666;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: #666; color: #aaa; }
+
+  .history-list { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  .history-list li {
+    background: #1e2235;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-list li .q-text { color: #ccc; flex: 1; }
+  .ans-yes { color: #1D9E75; font-weight: 600; }
+  .ans-no { color: #D85A30; font-weight: 600; }
+
+  .counter {
+    background: #1e2235;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .counter-num { font-size: 28px; font-weight: 700; color: #534AB7; }
+  .counter-label { font-size: 12px; color: #666; }
+  .counter-max { font-size: 13px; color: #444; }
+
+  .hint-box {
+    background: #1a1f2e;
+    border: 1px solid #2a3a2a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #6a9a6a;
+    line-height: 1.5;
+  }
+
+  /* Right panel — tree canvas */
+  .canvas-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 16px;
+    overflow: auto;
+    position: relative;
+  }
+  #tree-svg {
+    width: 100%;
+    max-width: 880px;
+    background: #14161f;
+    border-radius: 12px;
+    border: 1px solid #2a2d3e;
+  }
+
+  /* Reveal overlay */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .reveal-card {
+    background: #1a1d2e;
+    border: 2px solid #534AB7;
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 520px;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .reveal-card .emoji { font-size: 64px; margin-bottom: 16px; display: block; }
+  .reveal-card h2 { font-size: 28px; font-weight: 700; color: #AFA9EC; margin-bottom: 12px; }
+  .reveal-card p { font-size: 15px; color: #999; line-height: 1.7; margin-bottom: 24px; }
+  .reveal-card .highlight {
+    background: #0F6E56;
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .reveal-card .close-btn {
+    background: #534AB7;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Node animation */
+  .tree-node { transition: all 0.3s; }
+  @keyframes nodeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌳 Guess My Object — Live Tree Builder</h1>
+    <p>Students ask yes/no questions · You click YES or NO · The tree grows live</p>
+  </div>
+  <div class="secret-box">
+    🤫 Your secret object: <span id="secret-display">📱 Smartphone</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Left panel -->
+  <div class="left-panel">
+    <div>
+      <div class="panel-title">Question asked (from chat)</div>
+      <input class="question-input" id="q-input" placeholder="Type their question here..." maxlength="60" />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-yes" onclick="answer(true)">✓ YES</button>
+      <button class="btn btn-no" onclick="answer(false)">✗ NO</button>
+    </div>
+
+    <div class="counter">
+      <div>
+        <div class="counter-num" id="q-count">0</div>
+        <div class="counter-label">questions asked</div>
+      </div>
+      <div class="counter-max" id="q-limit">5 max</div>
+    </div>
+
+    <button class="btn-reveal" onclick="showReveal()">🎉 REVEAL THE ANSWER</button>
+    <button class="btn-reset" onclick="resetGame()">↺ New Game / Reset</button>
+
+    <div>
+      <div class="panel-title">Questions so far</div>
+      <ul class="history-list" id="history"></ul>
+    </div>
+
+    <div class="hint-box">
+      💡 <strong>Instructor tip:</strong> After the reveal, say:<br><em>"Every question = a split. Every yes/no = a branch. The last answer = a leaf. You just built a Decision Tree."</em>
+    </div>
+  </div>
+
+  <!-- Tree canvas -->
+  <div class="canvas-wrap">
+    <svg id="tree-svg" viewBox="0 0 880 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowW" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arrowG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arrowR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#D85A30" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <g id="tree-content"></g>
+      <!-- Empty state -->
+      <g id="empty-state">
+        <text x="440" y="200" text-anchor="middle" font-size="48" opacity="0.15">🌳</text>
+        <text x="440" y="260" text-anchor="middle" font-size="16" fill="#444" font-family="Segoe UI, Arial, sans-serif">The tree will grow here as students ask questions</text>
+        <text x="440" y="285" text-anchor="middle" font-size="13" fill="#333" font-family="Segoe UI, Arial, sans-serif">Type a question above → click YES or NO</text>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- Reveal overlay -->
+<div class="overlay" id="overlay">
+  <div class="reveal-card">
+    <span class="emoji">📱</span>
+    <h2>It was a Smartphone!</h2>
+    <p>You used <strong id="reveal-count">0</strong> questions to find it.</p>
+    <div class="highlight">
+      "Look at what you just built on screen.<br><br>
+      Every question you asked = <strong>a split</strong>.<br>
+      Every yes or no = <strong>a branch</strong>.<br>
+      The final answer = <strong>a leaf node</strong>.<br><br>
+      You didn't need a single line of code.<br>
+      <strong>You already think like a Decision Tree.</strong>"
+    </div>
+    <button class="close-btn" onclick="closeReveal()">Continue →</button>
+  </div>
+</div>
+
+<script>
+  // Tree state
+  let nodes = []; // { question, answer (true/false/null), id, parentId, side }
+  let questionCount = 0;
+  const MAX_Q = 5;
+
+  // Layout constants
+  const NODE_W = 190;
+  const NODE_H = 50;
+  const LEVEL_H = 100;
+  const START_X = 440;
+  const START_Y = 50;
+
+  function answer(isYes) {
+    const input = document.getElementById('q-input');
+    const q = input.value.trim();
+    if (!q) { input.focus(); input.style.borderColor = '#D85A30'; setTimeout(() => input.style.borderColor = '#3a3d5a', 1000); return; }
+    if (questionCount >= MAX_Q) return;
+
+    const id = questionCount;
+    const parentId = questionCount > 0 ? questionCount - 1 : null;
+    nodes.push({ question: q, answer: isYes, id, parentId });
+    questionCount++;
+
+    // Update history
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="q-text">${q}</span><span class="${isYes ? 'ans-yes' : 'ans-no'}">${isYes ? 'YES ✓' : 'NO ✗'}</span>`;
+    document.getElementById('history').prepend(li);
+
+    // Update counter
+    document.getElementById('q-count').textContent = questionCount;
+    document.getElementById('q-limit').textContent = `${MAX_Q - questionCount} remaining`;
+
+    input.value = '';
+    input.focus();
+
+    redrawTree();
+  }
+
+  function redrawTree() {
+    const g = document.getElementById('tree-content');
+    const empty = document.getElementById('empty-state');
+
+    if (nodes.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    g.innerHTML = '';
+
+    // Compute x positions per level
+    const levelCount = {};
+    nodes.forEach((n, i) => { levelCount[i] = 1; });
+
+    // Simple linear chain layout with YES branch continuing, NO branch going left
+    const positions = {};
+    nodes.forEach((n, i) => {
+      if (i === 0) {
+        positions[i] = { x: START_X, y: START_Y };
+      } else {
+        const prev = positions[i - 1];
+        // YES continues center-right, NO goes left
+        positions[i] = { x: prev.x, y: prev.y + LEVEL_H };
+      }
+    });
+
+    // Draw connector lines and NO dead-end boxes
+    nodes.forEach((n, i) => {
+      if (i === 0) return;
+      const from = positions[i - 1];
+      const to = positions[i];
+      const fromX = from.x;
+      const fromY = from.y + NODE_H;
+      const toX = to.x;
+      const toY = to.y;
+
+      // YES line (vertical, continuing)
+      const midY = (fromY + toY) / 2;
+      drawLine(g, fromX, fromY, toX, toY, '#1D9E75', 'arrowG');
+
+      // YES label
+      drawLabel(g, fromX + 14, fromY + (toY - fromY) / 2 - 4, 'YES ✓', '#1D9E75');
+
+      // Previous node's NO branch (dead-end box to the left)
+      const noX = from.x - 220;
+      const noY = from.y + LEVEL_H / 2 - NODE_H / 2;
+      drawLine(g, fromX - NODE_W / 2, from.y + NODE_H / 2, noX + 150, noY + NODE_H / 2, '#D85A30', 'arrowR', true);
+      drawLabel(g, fromX - 80, from.y + NODE_H / 2 - 6, 'NO ✗', '#D85A30');
+      drawDeadEnd(g, noX, noY);
+    });
+
+    // Draw last node's NO branch too
+    if (nodes.length > 0) {
+      const last = nodes[nodes.length - 1];
+      const pos = positions[nodes.length - 1];
+      const noX = pos.x - 220;
+      const noY = pos.y + LEVEL_H / 2 - NODE_H / 2;
+      if (!last.answer) {
+        // Last answer was NO — this is the final branch
+        drawLine(g, pos.x - NODE_W / 2, pos.y + NODE_H / 2, noX + 150, noY + NODE_H / 2, '#D85A30', 'arrowR', true);
+        drawLabel(g, pos.x - 80, pos.y + NODE_H / 2 - 6, 'NO ✗', '#D85A30');
+        drawDeadEnd(g, noX, noY);
+      }
+    }
+
+    // Draw all question nodes
+    nodes.forEach((n, i) => {
+      const pos = positions[i];
+      drawNode(g, pos.x - NODE_W / 2, pos.y, NODE_W, NODE_H, n.question, i === nodes.length - 1 && n.answer);
+    });
+
+    // Adjust SVG viewbox
+    const maxY = (nodes.length) * LEVEL_H + START_Y + NODE_H + 60;
+    document.getElementById('tree-svg').setAttribute('viewBox', `0 0 880 ${Math.max(480, maxY)}`);
+  }
+
+  function drawNode(g, x, y, w, h, text, isLeaf) {
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', y);
+    rect.setAttribute('width', w);
+    rect.setAttribute('height', h);
+    rect.setAttribute('rx', 8);
+    rect.setAttribute('fill', isLeaf ? '#0F6E56' : '#2a2050');
+    rect.setAttribute('stroke', isLeaf ? '#1D9E75' : '#534AB7');
+    rect.setAttribute('stroke-width', '1.5');
+    rect.style.animation = 'nodeIn 0.35s ease forwards';
+    g.appendChild(rect);
+
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x + w / 2);
+    txt.setAttribute('y', y + h / 2);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('dominant-baseline', 'central');
+    txt.setAttribute('font-size', '13');
+    txt.setAttribute('font-weight', '500');
+    txt.setAttribute('fill', isLeaf ? '#9FE1CB' : '#AFA9EC');
+    txt.setAttribute('font-family', 'Segoe UI, Arial, sans-serif');
+    txt.textContent = truncate(text, 24);
+    txt.style.animation = 'nodeIn 0.35s ease forwards';
+    g.appendChild(txt);
+  }
+
+  function drawDeadEnd(g, x, y) {
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', y);
+    rect.setAttribute('width', 150);
+    rect.setAttribute('height', NODE_H);
+    rect.setAttribute('rx', 8);
+    rect.setAttribute('fill', '#2a1515');
+    rect.setAttribute('stroke', '#993C1D');
+    rect.setAttribute('stroke-width', '1');
+    rect.setAttribute('stroke-dasharray', '5 3');
+    g.appendChild(rect);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x + 75);
+    txt.setAttribute('y', y + NODE_H / 2);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('dominant-baseline', 'central');
+    txt.setAttribute('font-size', '12');
+    txt.setAttribute('fill', '#D85A30');
+    txt.setAttribute('font-family', 'Segoe UI, Arial, sans-serif');
+    txt.textContent = 'Other category...';
+    g.appendChild(txt);
+  }
+
+  function drawLine(g, x1, y1, x2, y2, color, markerId, horizontal) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('marker-end', `url(#${markerId})`);
+    line.setAttribute('fill', 'none');
+    g.appendChild(line);
+  }
+
+  function drawLabel(g, x, y, text, color) {
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x);
+    txt.setAttribute('y', y);
+    txt.setAttribute('font-size', '11');
+    txt.setAttribute('font-weight', '600');
+    txt.setAttribute('fill', color);
+    txt.setAttribute('font-family', 'Segoe UI, Arial, sans-serif');
+    txt.textContent = text;
+    g.appendChild(txt);
+  }
+
+  function truncate(str, max) {
+    return str.length > max ? str.slice(0, max - 1) + '…' : str;
+  }
+
+  function showReveal() {
+    document.getElementById('reveal-count').textContent = questionCount;
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function closeReveal() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  function resetGame() {
+    nodes = [];
+    questionCount = 0;
+    document.getElementById('q-count').textContent = '0';
+    document.getElementById('q-limit').textContent = `${MAX_Q} max`;
+    document.getElementById('history').innerHTML = '';
+    document.getElementById('q-input').value = '';
+    document.getElementById('tree-content').innerHTML = '';
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('tree-svg').setAttribute('viewBox', '0 0 880 480');
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('q-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { document.querySelector('.btn-yes').focus(); }
+  });
+</script>
+</body>
+</html>
