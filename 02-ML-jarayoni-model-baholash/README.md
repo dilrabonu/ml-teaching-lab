@@ -88,7 +88,6 @@ To'liq dars rejasi, nutq skripti va metodika: **`Demo_Dars_2_ML_v2_Simulyator_bi
 ├── README.md
 ├── ML_Jarayoni_Taqdimot.pptx
 ├── Demo_Dars_2_ML_v2_Simulyator_bilan.docx
-├── Nutq_Skripti_Dars2_ML.docx
 ├── Warmup_Sen_Model_Bolasan.html
 ├── ML_Simulyator.html
 ├── ML_Jarayoni_Sxema.excalidraw
@@ -98,7 +97,7 @@ To'liq dars rejasi, nutq skripti va metodika: **`Demo_Dars_2_ML_v2_Simulyator_bi
 
 ## Video
 
-Video-yozuv havolasi: _(to'ldiriladi)_
+Video-yozuv havolasi: 
 
 ## Muallif
 
