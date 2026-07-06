@@ -97,7 +97,7 @@ To'liq dars rejasi, nutq skripti va metodika: **`Demo_Dars_2_ML_v2_Simulyator_bi
 
 ## Video
 
-Video-yozuv havolasi: 
+Video-yozuv havolasi:  https://drive.google.com/file/d/1rTCxjOt0t9HARqDbGYqwI6Kj2RBP0ulm/view?usp=sharing
 
 ## Muallif
 
