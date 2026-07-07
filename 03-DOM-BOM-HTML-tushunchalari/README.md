@@ -117,7 +117,7 @@ So'zma-so'z nutq skripti: **`Nutq_Skripti_YAKUNIY_DOM_BOM_Event.docx`**
 
 ## Video
 
-Video-yozuv havolasi: _(to'ldiriladi)_
+Video-yozuv havolasi: 
 
 ## Muallif
 
