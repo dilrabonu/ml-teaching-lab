@@ -11,7 +11,7 @@ Event practice:
 file:///C:/Users/user/Downloads/Element_Event_Amaliyoti.html 
 
 Explain Event and JavaScript with HTML:
-
+http://miro.com/app/board/uXjVH-X_4HU=/
 
 Consolidation: NearPod:
 https://nearpod.com/library/
