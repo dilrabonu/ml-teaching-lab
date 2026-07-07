@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOM, BOM, Element va Event'lar — Yakuniy loyiha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ==================== SIDEBAR (Streamlit uslubida navigatsiya) ==================== -->
+  <aside class="sidebar">
+    <div class="sidebar-title">
+      <p class="eyebrow">Al-Xorazmiy vorislari</p>
+      <h1>JS Playground</h1>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-page="bosh">Bosh sahifa</button>
+      <button class="nav-btn" data-page="dom">1. DOM</button>
+      <button class="nav-btn" data-page="bom">2. BOM</button>
+      <button class="nav-btn" data-page="element">3. Elementni boshqarish</button>
+      <button class="nav-btn" data-page="event">4. Event'lar</button>
+    </nav>
+    <div class="sidebar-footer">Dilrabo Xidirova<br>AI/ML mentor</div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="content">
+
+    <!-- ---------- BOSH SAHIFA ---------- -->
+    <section class="page active" id="page-bosh">
+      <p class="page-eyebrow">Xush kelibsiz</p>
+      <h2>Veb-sahifani "jonlantirish" — 4 qadamda</h2>
+      <p class="page-desc">Bu kichik ilova — bugungi darsimizdagi barcha mavzularni birlashtiradi. Chapdagi menyudan har bir mavzuni tanlab, jonli sinab ko'ring.</p>
+      <div class="card-grid">
+        <div class="mini-card blue"><span class="mini-num">1</span><h3>DOM</h3><p>Sahifaning "daraxt" tuzilishi</p></div>
+        <div class="mini-card amber"><span class="mini-num">2</span><h3>BOM</h3><p>Brauzerning o'zi bilan ishlash</p></div>
+        <div class="mini-card green"><span class="mini-num">3</span><h3>Elementni boshqarish</h3><p>querySelector, textContent, style</p></div>
+        <div class="mini-card pink"><span class="mini-num">4</span><h3>Event'lar</h3><p>addEventListener bilan interaktivlik</p></div>
+      </div>
+    </section>
+
+    <!-- ---------- 1. DOM ---------- -->
+    <section class="page" id="page-dom">
+      <p class="page-eyebrow">1-bo'lim</p>
+      <h2>DOM — sahifaning daraxti</h2>
+      <p class="page-desc">Har bir veb-sahifa — bu ichma-ich joylashgan elementlar daraxti. Quyidagi tugmani bosib, daraxtning har bir "shoxini" ajratib ko'ring.</p>
+
+      <div class="two-col">
+        <div class="panel">
+          <p class="panel-label">DOM daraxti</p>
+          <div class="tree" id="domTree">
+            <div class="tree-node" data-node="html">&lt;html&gt;</div>
+            <div class="tree-node indent1" data-node="body">&lt;body&gt;</div>
+            <div class="tree-node indent2" data-node="h1">&lt;h1&gt;</div>
+            <div class="tree-node indent2" data-node="button">&lt;button&gt;</div>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="panel-label">Nima uchun kerak?</p>
+          <p class="explain-text">DOM — JavaScript uchun "xarita". Bu xarita bo'lmasa, JavaScript sahifada nima borligini va qayerga "qo'l tekkizishni" bilmaydi.</p>
+          <div class="btn-row">
+            <button class="action-btn" id="domHighlightBtn">Daraxtni tekshirish</button>
+          </div>
+        </div>
+      </div>
+      <div class="code-box" id="domCode">// Tugmani bosib ko'ring</div>
+    </section>
+
+    <!-- ---------- 2. BOM ---------- -->
+    <section class="page" id="page-bom">
+      <p class="page-eyebrow">2-bo'lim</p>
+      <h2>BOM — brauzerning o'zi</h2>
+      <p class="page-desc">DOM — sahifa ICHI. BOM — brauzerning O'ZI (oyna o'lchami, xabar oynasi, manzil).</p>
+
+      <div class="two-col">
+        <div class="panel">
+          <p class="panel-label">Oyna kengligi</p>
+          <p class="explain-text">Bu — sahifa ichidagi narsa emas, balki brauzerning o'zi haqidagi ma'lumot.</p>
+          <div class="btn-row"><button class="action-btn" id="bomWidthBtn">window.innerWidth</button></div>
+        </div>
+        <div class="panel">
+          <p class="panel-label">Xabar oynasi</p>
+          <p class="explain-text">Brauzerning o'z xabar oynasini chiqarish.</p>
+          <div class="btn-row"><button class="action-btn" id="bomAlertBtn">window.alert()</button></div>
+        </div>
+      </div>
+      <div class="code-box" id="bomCode">// Tugmalarni bosib ko'ring</div>
+    </section>
+
+    <!-- ---------- 3. ELEMENT ---------- -->
+    <section class="page" id="page-element">
+      <p class="page-eyebrow">3-bo'lim</p>
+      <h2>Elementni boshqarish</h2>
+      <p class="page-desc">JavaScript sahifadagi elementni topib (querySelector), uni o'zgartira oladi (textContent, style).</p>
+
+      <div class="two-col">
+        <div class="panel preview-panel">
+          <p class="panel-label">Jonli sahifa</p>
+          <h3 id="liveH1">Salom, Dunyo!</h3>
+          <button id="liveBtn">Meni bos!</button>
+        </div>
+        <div class="panel">
+          <p class="panel-label">Boshqaruv</p>
+          <div class="btn-row" style="flex-direction:column; align-items:stretch; gap:8px;">
+            <button class="action-btn" id="elTextBtn">.textContent'ni o'zgartirish</button>
+            <button class="action-btn" id="elColorBtn">.style.color'ni o'zgartirish</button>
+            <button class="action-btn" id="elResetBtn">Qaytarish</button>
+          </div>
+        </div>
+      </div>
+      <div class="code-box" id="elementCode">// Tugmalarni bosib ko'ring</div>
+    </section>
+
+    <!-- ---------- 4. EVENT ---------- -->
+    <section class="page" id="page-event">
+      <p class="page-eyebrow">4-bo'lim</p>
+      <h2>Event'lar (Hodisalar)</h2>
+      <p class="page-desc">addEventListener — foydalanuvchi harakatiga (click, hover) dastur javob berishi.</p>
+
+      <div class="two-col">
+        <div class="panel preview-panel">
+          <p class="panel-label">Click event</p>
+          <div class="counter-display" id="clickCounter">0</div>
+          <button id="eventClickBtn">Bosing!</button>
+        </div>
+        <div class="panel preview-panel">
+          <p class="panel-label">Hover event</p>
+          <div class="hover-box" id="hoverBox">Sichqonchani shu yerga olib keling</div>
+        </div>
+      </div>
+      <div class="code-box" id="eventCode">// Tugmani bosing yoki sichqonchani olib keling</div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <p>Salom! Bu — brauzerning o'z xabar oynasi.</p>
+    <button id="modalClose">OK</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
