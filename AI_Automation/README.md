@@ -1,3 +1,6 @@
+Dars boshlanishi:
+file:///C:/Users/user/Downloads/1-kirish-slayd.html
+
 
 Warm up exercise:
 file:///C:/Users/user/Downloads/warmup.html
