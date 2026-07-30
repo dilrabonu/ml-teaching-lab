@@ -8,16 +8,17 @@ https://www.mentimeter.com/app/presentation/alyjgz8qgohvrqobjgwofzsvgdmm8ec5/edi
 
 Step 3:
 Warm up:
+file:///C:/Users/user/Downloads/3-warmup-bir-kunimiz.html 
 
 
-
-
-Warm up exercise:
-file:///C:/Users/user/Downloads/warmup.html
+Step 4:
+New Theme:
+Notion connect with Claude
+1. Install MCP
+2. Browse Notion
+3. Write prompt for checking 
+4. Excalidarw show the process
 
 
 MCP notion
 https://developers.notion.com/guides/mcp/get-started-with-mcp
-
-Excalidraw sxema:
-https://excalidraw.com/
