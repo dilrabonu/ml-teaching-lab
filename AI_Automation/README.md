@@ -1,5 +1,11 @@
-Dars boshlanishi:
-file:///C:/Users/user/Downloads/1-kirish-slayd.html
+Step 1 
+Introduction:
+https://gamma.app/docs/Avtomatlashtirish-qanday-ishlaydi-fmp2ce3kvdmw9v9?mode=doc
+
+Step 2:
+Asking homeowrk in Mentimeter:
+
+
 
 
 Warm up exercise:
