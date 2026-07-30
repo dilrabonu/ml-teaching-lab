@@ -4,6 +4,10 @@ https://gamma.app/docs/Avtomatlashtirish-qanday-ishlaydi-fmp2ce3kvdmw9v9?mode=do
 
 Step 2:
 Asking homeowrk in Mentimeter:
+https://www.mentimeter.com/app/presentation/alyjgz8qgohvrqobjgwofzsvgdmm8ec5/edit?question=zxsdd9gjbkfw
+
+Step 3:
+Warm up:
 
 
 
