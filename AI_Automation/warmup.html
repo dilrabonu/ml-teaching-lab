@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bir kunimiz — qaysi ishni robot qila oladi?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:#141b2e;
+    --paper:#f5f3ee;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --line:#e4e0d6;
+    --robot:#16a37f;
+    --robot-bg:#e5f5ef;
+    --human:#e8873b;
+    --human-bg:#fbeede;
+    --violet:#6c5ce7;
+    --violet-bg:#ece9fc;
+    --shadow:0 4px 20px rgba(20,27,46,.06);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    padding:clamp(16px,4vw,48px);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:860px;margin:0 auto;}
+
+  /* Header */
+  .eyebrow{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--violet);margin-bottom:10px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(26px,5vw,42px);font-weight:700;line-height:1.1;
+    letter-spacing:-.02em;margin-bottom:12px;
+  }
+  .lead{font-size:clamp(15px,2.2vw,17px);color:var(--muted);max-width:560px;line-height:1.5;}
+
+  /* Meter */
+  .meter{
+    margin:28px 0 8px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:20px 22px;box-shadow:var(--shadow);
+  }
+  .meter-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .meter-label{font-size:14px;color:var(--muted);font-weight:500;}
+  .meter-num{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:500;color:var(--ink);}
+  .meter-num b{color:var(--robot);font-size:19px;}
+  .track{height:12px;background:var(--paper);border-radius:99px;margin-top:14px;overflow:hidden;border:1px solid var(--line);}
+  .fill{height:100%;width:0;background:linear-gradient(90deg,#16a37f,#22c58a);border-radius:99px;transition:width .7s cubic-bezier(.22,1,.36,1);}
+
+  /* Timeline */
+  .timeline{margin-top:26px;position:relative;}
+  .timeline::before{
+    content:"";position:absolute;left:26px;top:12px;bottom:12px;width:2px;
+    background:linear-gradient(180deg,var(--line),var(--line) 70%,transparent);
+  }
+
+  .stop{position:relative;padding-left:64px;margin-bottom:12px;}
+  .dot{
+    position:absolute;left:16px;top:16px;width:22px;height:22px;border-radius:50%;
+    background:var(--card);border:2px solid var(--line);z-index:2;
+    display:flex;align-items:center;justify-content:center;transition:.3s;
+  }
+  .dot span{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.3s;}
+
+  .item{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:15px 18px;cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .18s ease,border-color .25s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .item:hover{transform:translateX(3px);}
+  .item:focus-visible{outline:2.5px solid var(--violet);outline-offset:3px;}
+  .item-head{display:flex;align-items:center;gap:14px;}
+  .time{
+    font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;
+    color:var(--muted);min-width:46px;font-variant-numeric:tabular-nums;
+  }
+  .task{flex:1;font-size:15px;font-weight:500;line-height:1.3;}
+  .badge{
+    font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;
+    padding:5px 12px;border-radius:99px;background:var(--paper);color:var(--muted);
+    white-space:nowrap;transition:.3s;border:1px solid var(--line);
+  }
+  .note{
+    font-size:13.5px;color:var(--muted);line-height:1.5;
+    max-height:0;overflow:hidden;opacity:0;padding-left:60px;
+    transition:max-height .35s ease,opacity .3s ease,margin .3s ease;
+  }
+
+  /* revealed states */
+  .stop.done.robot .dot{border-color:var(--robot);}
+  .stop.done.robot .dot span{background:var(--robot);transform:scale(1.3);}
+  .stop.done.robot .item{border-color:var(--robot);}
+  .stop.done.robot .badge{background:var(--robot-bg);color:var(--robot);border-color:transparent;}
+
+  .stop.done.human .dot{border-color:var(--human);}
+  .stop.done.human .dot span{background:var(--human);transform:scale(1.3);}
+  .stop.done.human .badge{background:var(--human-bg);color:var(--human);border-color:transparent;}
+
+  .stop.done .note{max-height:80px;opacity:1;margin-top:10px;}
+
+  /* Finale */
+  .finale{
+    margin-top:22px;background:var(--ink);color:#fff;border-radius:20px;
+    padding:26px 24px;opacity:0;transform:translateY(12px);
+    transition:opacity .5s ease,transform .5s ease;
+  }
+  .finale.show{opacity:1;transform:translateY(0);}
+  .finale h2{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em;}
+  .finale p{font-size:15px;line-height:1.55;color:#c8cdda;}
+  .finale .hl{color:#5eead4;font-weight:600;}
+
+  .hint{margin-top:18px;font-size:13px;color:var(--muted);text-align:center;font-style:italic;}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Avtomatizatsiya · Warm-up</div>
+  <h1>Bir kunimiz — qaysi ishni robot qila oladi?</h1>
+  <p class="lead">Quyida oddiy ish kunimiz. Har bir ishni bosishdan oldin o'ylab ko'ring: buni sun'iy intellekt bajara oladimi? Keyin bosing — javobni ochamiz.</p>
+
+  <div class="meter">
+    <div class="meter-top">
+      <span class="meter-label">Avtomatlashtirilishi mumkin bo'lgan ishlar</span>
+      <span class="meter-num"><b id="cnt">0</b> / 6</span>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <div class="timeline" id="tl"></div>
+
+  <div class="finale" id="finale">
+    <h2>Kunning yarmidan ko'pi!</h2>
+    <p>6 ishning <span class="hl">4 tasi</span> avtomatlashtirilishi mumkin. Diqqat qiling — tushlik va ijodiy qaror <span class="hl">insonda qoldi</span>. Avtomatizatsiya sizni almashtirmaydi; u zerikarli, takrorlanuvchi ishni oladi va sizga muhim ishga vaqt qoldiradi.<br><br>Keling, ana shu <span class="hl">soat 11:00'dagi</span> nomzodlar ro'yxatini hoziroq — jonli — birga avtomatlashtiramiz.</p>
+  </div>
+
+  <p class="hint">Barcha ishlarni bosib, kuningizni to'liq oching</p>
+</div>
+
+<script>
+  const TASKS=[
+    {t:"08:00",name:"Email va xabarlarni tekshirish",robot:true,note:"AI muhim xatlarni ajratadi, javob variantlarini qoralab beradi."},
+    {t:"09:30",name:"Yig'ilish yozuvlarini yuritish",robot:true,note:"Suhbatni matnga aylantirib, asosiy qarorlarни ajratadi."},
+    {t:"11:00",name:"Yangi nomzodlarni ro'yxatga olish",robot:true,note:"Bugungi asosiy demomiz — bo'sh jadval bir buyruqda to'ladi."},
+    {t:"13:00",name:"Hamkasb bilan tushlik",robot:false,note:"Buni robotga bermaymiz — inson aloqasi hech narsaga almashmaydi."},
+    {t:"15:00",name:"Haftalik hisobot tayyorlash",robot:true,note:"Ma'lumotlardan jadval, grafik va qisqa xulosa chiqaradi."},
+    {t:"17:00",name:"Muhim qaror qabul qilish",robot:false,note:"Bu — inson ishi. AI ma'lumot beradi, lekin qaror sizniki."}
+  ];
+
+  const tl=document.getElementById('tl');
+  const fill=document.getElementById('fill');
+  const cnt=document.getElementById('cnt');
+  let opened=0, robots=0;
+
+  TASKS.forEach((d,i)=>{
+    const stop=document.createElement('div');
+    stop.className='stop';
+    stop.innerHTML=`
+      <div class="dot"><span></span></div>
+      <div class="item" tabindex="0" role="button" aria-expanded="false">
+        <div class="item-head">
+          <span class="time">${d.t}</span>
+          <span class="task">${d.name}</span>
+          <span class="badge">bosing</span>
+        </div>
+      </div>
+      <p class="note">${d.note}</p>`;
+    tl.appendChild(stop);
+
+    const item=stop.querySelector('.item');
+    const badge=stop.querySelector('.badge');
+    const reveal=()=>{
+      if(stop.classList.contains('done'))return;
+      stop.classList.add('done',d.robot?'robot':'human');
+      badge.textContent=d.robot?'AI qila oladi':'Inson ishi';
+      item.setAttribute('aria-expanded','true');
+      opened++;
+      if(d.robot){robots++;cnt.textContent=robots;fill.style.width=(robots/6*100)+'%';}
+      if(opened===TASKS.length)setTimeout(()=>document.getElementById('finale').classList.add('show'),350);
+    };
+    item.addEventListener('click',reveal);
+    item.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal();}});
+  });
+</script>
+</body>
+</html>

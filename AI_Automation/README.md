@@ -7,4 +7,4 @@ MCP notion
 https://developers.notion.com/guides/mcp/get-started-with-mcp
 
 Excalidraw sxema:
-
+https://excalidraw.com/
