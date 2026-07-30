@@ -18,6 +18,11 @@ Notion connect with Claude
 2. Browse Notion
 3. Write prompt for checking 
 4. Excalidarw show the process
+https://excalidraw.com/  
+
+Step 5:
+Consolidation:
+file:///C:/Users/user/Downloads/5-konsolidatsiya-retsept-quruvchi.html
 
 
 MCP notion
