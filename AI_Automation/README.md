@@ -94,7 +94,7 @@ Choose the option that matches how you use Claude:
    https://mcp.notion.com/mcp
    ```
 3. Complete the OAuth flow to connect your Notion workspace.
-   *(Available on Pro, Max, Team, and Enterprise plans.)*
+
 
 **Claude Code (terminal)**
 ```bash
@@ -110,7 +110,6 @@ Then run `/mcp` and follow the OAuth flow.
 ### Step 2 — Browse Notion
 
 Once connected, confirm it works. Ask Claude something simple like:
-> *"List the pages in my Notion workspace."*
 
 If Claude can read your workspace, the connection is live.
 
@@ -171,12 +170,5 @@ Learners pick **one repetitive task** from their own field, write an RKVF prompt
 
 ---
 
-## 📌 Notes
-
-- Notion MCP uses **OAuth** — a human must authorize access (no bearer tokens).
-- File/image uploads are not yet supported through Notion MCP.
-- Recommended transport: **Streamable HTTP** (`https://mcp.notion.com/mcp`).
-
----
 
 *Built for an interactive, tool-rich teaching experience — one lesson, six stages, six different tools.*
