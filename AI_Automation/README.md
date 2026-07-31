@@ -1,37 +1,3 @@
-Step 1 
-Introduction:
-https://gamma.app/docs/Avtomatlashtirish-qanday-ishlaydi-fmp2ce3kvdmw9v9?mode=doc
-
-Step 2:
-Asking homeowrk in Mentimeter:
-https://www.mentimeter.com/app/presentation/alyjgz8qgohvrqobjgwofzsvgdmm8ec5/edit?question=zxsdd9gjbkfw
-
-Step 3:
-Warm up:
-file:///C:/Users/user/Downloads/3-warmup-bir-kunimiz.html 
-
-
-Step 4:
-New Theme:
-Notion connect with Claude
-1. Install MCP
-2. Browse Notion
-3. Write prompt for checking 
-4. Excalidarw show the process
-https://excalidraw.com/  
-
-Step 5:
-Consolidation:
-file:///C:/Users/user/Downloads/5-konsolidatsiya-retsept-quruvchi.html
-
-
-Lesson Plan:
-https://miro.com/app/board/uXjVH4P5NKc=/
-
-
-MCP notion
-https://developers.notion.com/guides/mcp/get-started-with-mcp
-
 # 🤖 How Automation Works — AI-Powered Lesson
 
 > A 30-minute interactive lesson that shows how to automate real work with AI — **without writing any code**.
