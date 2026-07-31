@@ -27,5 +27,7 @@ file:///C:/Users/user/Downloads/5-konsolidatsiya-retsept-quruvchi.html
 
 Lesson Plan:
 https://miro.com/app/board/uXjVH4P5NKc=/
+
+
 MCP notion
 https://developers.notion.com/guides/mcp/get-started-with-mcp
