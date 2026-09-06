@@ -11,4 +11,4 @@ https://gamma.app/docs/8p41c2654ynhmz3
 
 
 Task in group:
-https://excalidraw.com/#json=X1lA3pxah1nu9ZV0PfgT3,YDYjf-haz1228r_FvaJ1sA
+https://excalidraw.com/#json=h-EnumWWscXvoGRXTVP-Q,5xGAi3TenwIVjsT9FciylQ 
