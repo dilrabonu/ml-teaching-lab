@@ -12,3 +12,5 @@ https://gamma.app/docs/8p41c2654ynhmz3
 
 Task in group:
 https://excalidraw.com/#json=h-EnumWWscXvoGRXTVP-Q,5xGAi3TenwIVjsT9FciylQ 
+
+Task Ai, ML, Generative AI, LLM
