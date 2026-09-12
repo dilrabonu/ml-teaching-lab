@@ -10,3 +10,6 @@ https://excalidraw.com/#json=MRkSst3U1TQuU3_2uEU1o,yqvRoy3f8E8hELJW0tgY-w
 Slide for the lesson:
 First:
 https://gamma.app/generations/9m7zWd0heXrZRy8aHBJOr 
+
+Second:
+https://gamma.app/generations/6fw1DbRHZjVMnvhLpFfQc
